@@ -1,4 +1,4 @@
-# ApiLogin Addons Cockpit CMS V2
+# LoginApi Addons Cockpit CMS V2
 
 The ApiLogin addon is designed to provide user authentication, registration, and user management functionality through REST API endpoints. It is especially useful for applications where user data needs to be accessed or managed through API calls rather than through a traditional web interface. Below is a detailed explanation of how ApiLogin works, with a focus on its main features and functionality:
 
@@ -51,7 +51,7 @@ The ApiLogin addon is designed to provide user authentication, registration, and
 
 ### How to Use ApiLogin
 
-1.  **Installation:** Install the ApiLogin addon into your cockpit cms
+1.  **Installation:** Install the ApiLogin addons into your cockpit cms /addons/LoginApi
 2.  **Setup:** Create Role 'public' and setup it as public api
 3.  **Authentication:** Use the `/user/auth` endpoint to verify users' credentials. This can be integrated with a frontend login form.
 4.  **Registration:** Allow new users to create accounts using the `/user/register` endpoint. Validate the data on both frontend and backend for security.
