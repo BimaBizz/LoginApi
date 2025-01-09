@@ -17,14 +17,19 @@ $this->on('restApi.config', function($restApi) {
          * @OA\Post(
          *     path="/user/auth",
          *     tags={"user"},
-         *     @OA\RequestBody(
-         *         description="User login details",
+         *     @OA\Parameter(
+         *         name="email",
+         *         in="query",
          *         required=true,
-         *         @OA\JsonContent(
-         *             type="object",
-         *             @OA\Property(property="email", type="string"),
-         *             @OA\Property(property="password", type="string")
-         *         )
+         *         description="email user",
+         *         @OA\Schema(type="email")
+         *     ),
+         *     @OA\Parameter(
+         *         name="password",
+         *         in="query",
+         *         required=true,
+         *         description="password user",
+         *         @OA\Schema(type="string")
          *     ),
          *     @OA\Response(response="200", description="User authenticated, user data returned"),
          *     @OA\Response(response="412", description="Email or password missing or authentication failed"),
@@ -83,16 +88,33 @@ $this->on('restApi.config', function($restApi) {
          * @OA\Post(
          *     path="/user/register",
          *     tags={"user"},
-         *     @OA\RequestBody(
-         *         description="User registration details",
+         *     @OA\Parameter(
+         *         name="user",
+         *         in="query",
          *         required=true,
-         *         @OA\JsonContent(
-         *             type="object",
-         *             @OA\Property(property="user", type="string"),
-         *             @OA\Property(property="name", type="string"),
-         *             @OA\Property(property="email", type="string"),
-         *             @OA\Property(property="password", type="string"),
-         *         )
+         *         description="username user have",
+         *         @OA\Schema(type="string")
+         *     ),
+         *     @OA\Parameter(
+         *         name="name",
+         *         in="query",
+         *         required=true,
+         *         description="full name user have",
+         *         @OA\Schema(type="string")
+         *     ),
+         *     @OA\Parameter(
+         *         name="email",
+         *         in="query",
+         *         required=true,
+         *         description="email user have",
+         *         @OA\Schema(type="email")
+         *     ),
+         *     @OA\Parameter(
+         *         name="password",
+         *         in="query",
+         *         required=true,
+         *         description="password user have",
+         *         @OA\Schema(type="string")
          *     ),
          *     @OA\Response(response="200", description="User registered successfully"),
          *     @OA\Response(response="412", description="User or email already exists"),
@@ -191,6 +213,10 @@ $this->on('restApi.config', function($restApi) {
          * )
          */
         'GET' => function($params, $app) {
+
+            if (!$this->helper('acl')->isSuperAdmin()) {
+                return $this->stop(401);
+            }
     
             // Fetch all user data from 'system/users'
             $users = $app->dataStorage->find('system/users')->toArray();
