@@ -37,6 +37,12 @@ $this->on('restApi.config', function($restApi) {
          */
         'POST' => function($params, $app) {
 
+            // Check permission
+            if (!$app->helper('acl')->isAllowed('loginapi/api/auth', $app->helper('auth')->getUser('role'))) {
+                $app->response->status = 403;
+                return ['error' => 'Permission denied'];
+            }
+
             $email = $app->param('email');
             $password = $app->param('password');
 
@@ -51,32 +57,13 @@ $this->on('restApi.config', function($restApi) {
                 return $app->stop(['error' => 'Authentication failed!'], 412);
             }
 
-            // Check if the user has an apiKey
-            if (!empty($user['apiKey'])) {
-                // Return full user data if apiKey exists
-                return [
-                    'apiKey' => $user['apiKey'],
-                    'active' => $user['active'],
-                    'user' => $user['user'],
-                    'name' => $user['name'],
-                    'email' => $user['email'],
-                    'i18n' => $user['i18n'],
-                    'theme' => $user['theme'],
-                    '_id' => $user['_id']
-                ];
-            } else {
-                // If no apiKey, return a message that the account is under review
-                return [
-                    'message' => 'Your account is under review',
-                    'active' => $user['active'],
-                    'user' => $user['user'],
-                    'name' => $user['name'],
-                    'email' => $user['email'],
-                    'i18n' => $user['i18n'],
-                    'theme' => $user['theme'],
-                    '_id' => $user['_id']
-                ];
-            }
+            // Remove sensitive data from user data
+            unset($user['password'], $user['twofa'], $user['apiKey']);
+
+            // Generate JWT token with all user data except sensitive fields
+            $token = $app->helper('jwt')->create($user);
+
+            return ['JWT' => $token];
         }
 
     ]);
@@ -121,6 +108,12 @@ $this->on('restApi.config', function($restApi) {
          * )
          */
         'POST' => function($params, $app) {
+
+            // Check permission
+            if (!$app->helper('acl')->isAllowed('loginapi/api/register', $app->helper('auth')->getUser('role'))) {
+                $app->response->status = 403;
+                return ['error' => 'Permission denied'];
+            }
 
             // Mengambil parameter dari request
             $user = $app->param('user');
@@ -214,8 +207,10 @@ $this->on('restApi.config', function($restApi) {
          */
         'GET' => function($params, $app) {
 
-            if (!$this->helper('acl')->isSuperAdmin()) {
-                return $this->stop(401);
+            // Check permission
+            if (!$app->helper('acl')->isAllowed('loginapi/api/list', $app->helper('auth')->getUser('role'))) {
+                $app->response->status = 403;
+                return ['error' => 'Permission denied'];
             }
     
             // Fetch all user data from 'system/users'
@@ -255,6 +250,12 @@ $this->on('restApi.config', function($restApi) {
          * )
          */
         'GET' => function($params, $app) {
+
+            // Check permission
+            if (!$app->helper('acl')->isAllowed('loginapi/api/get', $app->helper('auth')->getUser('role'))) {
+                $app->response->status = 403;
+                return ['error' => 'Permission denied'];
+            }
 
             // Get the _id from the path parameters
             $userId = $params['id'];
